@@ -138,10 +138,3 @@ BK Tutor Program Team
 **Trường Đại học Bách Khoa - Đại học Quốc gia TP.HCM**
 ```
 
-Bạn đang ở chế độ ask mode, nên tôi không thể tạo file trực tiếp. Hãy:
-
-1. Tạo file `README.md` trong thư mục gốc của dự án
-2. Copy nội dung trên vào file đó
-3. Điều chỉnh các phần như `YOUR_USERNAME` và thông tin khác nếu cần
-
-Bạn có muốn tôi điều chỉnh nội dung nào trong README không?
