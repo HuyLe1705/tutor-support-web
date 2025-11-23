@@ -133,8 +133,3 @@ Private project - Đại học Bách Khoa TP.HCM
 
 BK Tutor Program Team
 
----
-
-**Trường Đại học Bách Khoa - Đại học Quốc gia TP.HCM**
-```
-
