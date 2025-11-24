@@ -164,7 +164,7 @@ export default function Sidebar() {
     };
 
     if (role === 'student') return [GeneralGroup,studentGroup]; // Chỉ hiện nhóm student
-    if (role === 'tutor') return [GeneralGroup.tutorGroup]; 
+    if (role === 'tutor') return [GeneralGroup,tutorGroup]; 
     if (role === 'mixed') return [GeneralGroup,studentGroup, tutorGroup];
     if (role === 'admin') return [GeneralGroup,adminGroup];
     
