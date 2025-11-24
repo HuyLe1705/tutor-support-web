@@ -64,21 +64,26 @@ export default function Sidebar() {
       ]
     };
 
+    const GeneralGroup = {
+      title: null, // Không cần tiêu đề nhóm
+      items: [
+           // 1. Hồ sơ mở rộng (Dropdown)
+           { 
+               label: 'Hồ sơ mở rộng', 
+               icon: UserCircle, 
+               type: 'dropdown',
+               items: [
+                   { label: 'Cập nhật hồ sơ mở rộng', href: '/dashboard/profile/update' },
+                   { label: 'Thêm mới hồ sơ mở rộng', href: '/dashboard/profile/create' },
+                   { label: 'Xem hồ sơ mở rộng', href: '/dashboard/profile/view' },
+               ]
+           }]}
+
     // --- CẤU TRÚC MENU SINH VIÊN (Dựa trên ảnh bạn gửi) ---
     const studentGroup = {
         title: null, // Không cần tiêu đề nhóm
         items: [
-             // 1. Hồ sơ mở rộng (Dropdown)
-             { 
-                 label: 'Hồ sơ mở rộng', 
-                 icon: UserCircle, 
-                 type: 'dropdown',
-                 items: [
-                     { label: 'Cập nhật hồ sơ mở rộng', href: '/dashboard/student/profile/update' },
-                     { label: 'Thêm mới hồ sơ mở rộng', href: '/dashboard/student/profile/create' },
-                     { label: 'Xem hồ sơ mở rộng', href: '/dashboard/student/profile/view' },
-                 ]
-             },
+             
              // 2. Chương trình tutor-mentee (Dropdown)
              {
                  label: 'Chương trình tutor-mentee',
@@ -111,14 +116,7 @@ export default function Sidebar() {
 
     const tutorGroup = {
       items: [
-        { label: 'Hồ sơ mở rộng', 
-          icon: UserCircle, 
-          type: 'dropdown',
-          items: [
-              { label: 'Cập nhật hồ sơ mở rộng', href: '/dashboard/student/profile/update' },
-              { label: 'Thêm mới hồ sơ mở rộng', href: '/dashboard/student/profile/create' },
-              { label: 'Xem hồ sơ mở rộng', href: '/dashboard/student/profile/view' },
-          ]},
+        
         {
             label: 'Thiết lập & Quản lý phiên',
             icon: Calendar,
@@ -141,16 +139,7 @@ export default function Sidebar() {
       title: 'Quản trị',
       items: [
         // 1. Hồ sơ mở rộng (Dropdown)
-        { 
-            label: 'Hồ sơ mở rộng', 
-            icon: UserCircle, 
-            type: 'dropdown',
-            items: [
-                { label: 'Cập nhật hồ sơ mở rộng', href: '/dashboard/student/profile/update' },
-                { label: 'Thêm mới hồ sơ mở rộng', href: '/dashboard/student/profile/create' },
-                { label: 'Xem hồ sơ mở rộng', href: '/dashboard/student/profile/view' },
-            ]
-        },
+        
         // 2. Chương trình tutor-mentee (Dropdown)
         {
             label: 'Chương trình tutor-mentee',
@@ -174,10 +163,10 @@ export default function Sidebar() {
       ]
     };
 
-    if (role === 'student') return [studentGroup]; // Chỉ hiện nhóm student
-    if (role === 'tutor') return [tutorGroup]; 
-    if (role === 'mixed') return [studentGroup, tutorGroup];
-    if (role === 'admin') return [adminGroup];
+    if (role === 'student') return [GeneralGroup,studentGroup]; // Chỉ hiện nhóm student
+    if (role === 'tutor') return [GeneralGroup.tutorGroup]; 
+    if (role === 'mixed') return [GeneralGroup,studentGroup, tutorGroup];
+    if (role === 'admin') return [GeneralGroup,adminGroup];
     
     return [commonGroup];
   };
