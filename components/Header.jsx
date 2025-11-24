@@ -1,27 +1,58 @@
-"use client"; // Cần useAuth nên phải là Client Component
-import { Globe } from 'lucide-react';
+"use client"; 
 import { useAuth } from '@/context/AuthContext';
 
-export default function Header({ title }) {
+export default function Header() {
   const { user } = useAuth();
 
   return (
-    <header className="bg-white shadow-sm h-16 flex items-center justify-between px-8 sticky top-0 z-10">
+ 
+    <header className="fixed top-0 right-0 left-64 h-[61px] bg-[#3C8DBC] flex items-center justify-between px-6 z-20 shadow-md font-sans">
+      
+      {/* --- BÊN TRÁI: TÊN CHƯƠNG TRÌNH --- */}
       <div className="flex items-center gap-4">
-        <h2 className="text-xl font-bold text-gray-700">Tutor</h2>
-        <span className="text-gray-400">/</span>
-        <span className="text-gray-500">{title}</span>
+        
       </div>
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 text-gray-600 text-sm cursor-pointer hover:bg-gray-100 p-2 rounded">
-           <Globe size={16}/> <span>VN</span>
-        </div>
-        <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
-            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
-                {user?.avatar || 'U'}
+
+      {/* --- BÊN PHẢI: USER & NGÔN NGỮ --- */}
+      <div className="flex items-center gap-6">
+        
+        {/* 1. User Info (Avatar + Tên in hoa trắng) */}
+        <div className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+            {/* Vòng tròn trắng bao quanh avatar */}
+            <div className="w-8 h-8 rounded-full bg-white p-[2px] flex items-center justify-center overflow-hidden">
+                <img 
+                    src={user?.avatar || "https://www.shutterstock.com/image-vector/cute-smiling-teacher-tutor-avatar-260nw-1697507119.jpg"} 
+                    alt="Avatar"
+                    className="w-full h-full rounded-full object-cover"
+                />
             </div>
-            <span className="text-sm font-medium text-gray-700">{user?.name || 'User Name'}</span>
+            {/* Tên user: Chữ trắng, In hoa, Đậm */}
+            <span className="text-sm font-bold text-white uppercase">
+                {user?.name || 'USER NAME'}
+            </span>
         </div>
+
+        {/* 2. Cờ Ngôn ngữ (Có gạch dọc ngăn cách) */}
+        <div className="flex items-center gap-2 border-l border-white/30 pl-6 h-6">
+           {/* Cờ Việt Nam */}
+           <button className="hover:scale-110 transition-transform" title="Tiếng Việt">
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg" 
+                alt="VN" 
+                className="w-6 h-4 object-cover shadow-sm border border-white/20"
+              />
+           </button>
+           
+           {/* Cờ Anh/Úc */}
+           <button className="hover:scale-110 transition-transform opacity-70 hover:opacity-100" title="English">
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/8/83/Flag_of_the_United_Kingdom_%283-5%29.svg" 
+                alt="EN" 
+                className="w-6 h-4 object-cover shadow-sm border border-white/20"
+              />
+           </button>
+        </div>
+
       </div>
     </header>
   );

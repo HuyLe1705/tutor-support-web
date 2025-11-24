@@ -1,6 +1,6 @@
 "use client";
 import Header from '@/components/Header';
-import { SCHEDULES } from '@/data/mockData';
+import { TUTOR_SCHEDULES } from '@/data/mockData';
 import { Plus, Trash2, Edit2 } from 'lucide-react';
 
 export default function SchedulePage() {
@@ -12,7 +12,7 @@ export default function SchedulePage() {
           <h3 className="text-lg font-bold text-gray-800 mb-6 border-b pb-2">Lịch rảnh định kỳ</h3>
           
           <div className="space-y-4 bg-gray-50 p-6 rounded-lg">
-            {SCHEDULES.map((schedule) => (
+            {TUTOR_SCHEDULES.map((schedule) => (
               <div key={schedule.id} className="flex items-center justify-between bg-white p-4 rounded border border-gray-200 shadow-sm">
                 <div className="flex items-center gap-4">
                     <div className="font-semibold text-gray-700 w-20">{schedule.day}</div>
