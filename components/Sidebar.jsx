@@ -4,11 +4,12 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { 
-  LayoutDashboard, UserCircle, Calendar, Users, 
-  FileText, BookOpen, LogOut, ShieldCheck,
-  ChevronDown, ChevronRight, BarChart3,
-  // Thêm các icon mới cho menu sinh viên
-  Bell, MessageSquare, HelpCircle, Settings
+  // Icon điều hướng & Hệ thống
+  LayoutDashboard, LogOut, ChevronDown, ChevronRight, Shield, Settings, Database,
+  // Icon chức năng chung
+  User, Users, Calendar, BarChart3, Bell, FileText, Search, HelpCircle,
+  // Icon hành động
+  PenTool, CheckSquare, RefreshCw, XCircle, MessageSquare, TrendingUp, BookOpen,UserCircle
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -84,11 +85,20 @@ export default function Sidebar() {
                  icon: Users,
                  type: 'dropdown',
                  items: [
-                     { label: 'Quản lý đăng ký', href: '/dashboard/student/tutor-mentee/register' },
-                     { label: 'Quản lý ghép cặp', href: '/dashboard/student/tutor-mentee/pairing' },
-                     { label: 'Xem danh sách mentee của phiên', href: '/dashboard/student/tutor-mentee/list' },
-                     { label: 'Xem biên bản', href: '/dashboard/student/tutor-mentee/minutes' },
-                 ]
+                     
+                      { label: 'Đăng kí chương trình', href: '/dashboard/student/register', icon: PenTool, type: 'link' },
+                      { label: 'Đăng ký của tôi', href: '/dashboard/student/my-registration', icon: CheckSquare, type: 'link' },
+                      { label: 'Tìm kiếm Tutor/Phiên', href: '/dashboard/student/search', icon: Search, type: 'link' },
+                      { label: 'Đặt chỗ phiên', href: '/dashboard/student/booking', icon: Calendar, type: 'link' },
+                      { label: 'Đổi lịch', href: '/dashboard/student/reschedule', icon: RefreshCw, type: 'link' },
+                      { label: 'Hủy chỗ', href: '/dashboard/student/cancel', icon: XCircle, type: 'link' },
+                      { label: 'Cấu hình thông báo', href: '/dashboard/student/notifications', icon: Bell, type: 'link' },
+                      { label: 'Phản hồi & Đánh giá', href: '/dashboard/student/feedback', icon: MessageSquare, type: 'link' },
+                      { label: 'Tiến độ học tập', href: '/dashboard/student/progress', icon: TrendingUp, type: 'link' },
+                      { label: 'Tài liệu học tập', href: '/dashboard/student/materials', icon: BookOpen, type: 'link' },
+                      { label: 'Hỏi đáp', href: '/dashboard/student/qa', icon: HelpCircle, type: 'link' },
+                      { label: 'Cá nhân hóa', href: '/dashboard/student/personalization', icon: Settings, type: 'link' }
+                              ]
              },
              // 3. Các mục đơn khác
              { label: 'Phản hồi và đánh giá', href: '/dashboard/student/feedback', icon: MessageSquare, type: 'link' },
@@ -103,7 +113,14 @@ export default function Sidebar() {
 
     const tutorGroup = {
       items: [
-        { label: 'Hồ sơ mở rộng', href: '/dashboard/profile', icon: UserCircle, type: 'link' },
+        { label: 'Hồ sơ mở rộng', 
+          icon: UserCircle, 
+          type: 'dropdown',
+          items: [
+              { label: 'Cập nhật hồ sơ mở rộng', href: '/dashboard/student/profile/update' },
+              { label: 'Thêm mới hồ sơ mở rộng', href: '/dashboard/student/profile/create' },
+              { label: 'Xem hồ sơ mở rộng', href: '/dashboard/student/profile/view' },
+          ]},
         {
             label: 'Thiết lập & Quản lý phiên',
             icon: Calendar,
@@ -122,7 +139,37 @@ export default function Sidebar() {
     const adminGroup = {
       title: 'Quản trị',
       items: [
-        { label: 'Hệ thống', href: '/dashboard/admin', icon: ShieldCheck, type: 'link' },
+        // 1. Hồ sơ mở rộng (Dropdown)
+        { 
+            label: 'Hồ sơ mở rộng', 
+            icon: UserCircle, 
+            type: 'dropdown',
+            items: [
+                { label: 'Cập nhật hồ sơ mở rộng', href: '/dashboard/student/profile/update' },
+                { label: 'Thêm mới hồ sơ mở rộng', href: '/dashboard/student/profile/create' },
+                { label: 'Xem hồ sơ mở rộng', href: '/dashboard/student/profile/view' },
+            ]
+        },
+        // 2. Chương trình tutor-mentee (Dropdown)
+        {
+            label: 'Chương trình tutor-mentee',
+            icon: Users,
+            type: 'dropdown',
+            items: [
+                { label: 'Quản lý đăng ký', href: '/dashboard/student/tutor-mentee/register' },
+                { label: 'Quản lý ghép cặp', href: '/dashboard/student/tutor-mentee/pairing' },
+                { label: 'Xem danh sách mentee của phiên', href: '/dashboard/student/tutor-mentee/list' },
+                { label: 'Xem biên bản', href: '/dashboard/student/tutor-mentee/minutes' },
+            ]
+        },
+        // 3. Các mục đơn khác
+        { label: 'Phản hồi và đánh giá', href: '/dashboard/student/feedback', icon: MessageSquare, type: 'link' },
+        { label: 'Tiến độ học tập', href: '/dashboard/student/progress', icon: BarChart3, type: 'link' },
+        { label: 'Báo cáo', href: '/dashboard/student/report', icon: FileText, type: 'link' },
+        { label: 'Tài liệu học tập', href: '/dashboard/student/materials', icon: BookOpen, type: 'link' },
+        { label: 'Không gian hỏi đáp', href: '/dashboard/student/qa', icon: HelpCircle, type: 'link' },
+        { label: 'Cá nhân hóa học tập', href: '/dashboard/student/personalization', icon: Settings, type: 'link' },
+        { label: 'Cấu hình thông báo', href: '/dashboard/student/notifications', icon: Bell, type: 'link' },
       ]
     };
 
