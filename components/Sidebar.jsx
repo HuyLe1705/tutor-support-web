@@ -31,7 +31,7 @@ export default function Sidebar() {
     if (role === 'student') return [...commonItems, ...studentItems];
     if (role === 'tutor') return [...commonItems, ...tutorItems];
     if (role === 'mixed') return [...commonItems, ...studentItems, ...tutorItems]; // Mixed thấy hết
-    if (role === 'admin') return [...commonItems, { label: 'Quản trị hệ thống', href: '/dashboard/admin', icon: Users }];
+    //if (role === 'admin') return [...commonItems, { label: 'Quản trị hệ thống', href: '/dashboard/admin', icon: Users }];
     
     return commonItems; // Mặc định
   };
