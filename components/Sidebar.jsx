@@ -92,12 +92,10 @@ export default function Sidebar() {
                       { label: 'Đặt chỗ phiên', href: '/dashboard/student/booking', icon: Calendar, type: 'link' },
                       { label: 'Đổi lịch', href: '/dashboard/student/reschedule', icon: RefreshCw, type: 'link' },
                       { label: 'Hủy chỗ', href: '/dashboard/student/cancel', icon: XCircle, type: 'link' },
-                      { label: 'Cấu hình thông báo', href: '/dashboard/student/notifications', icon: Bell, type: 'link' },
+                      { label: 'Cấu hình kênh/tần suất thông báo', href: '/dashboard/student/notifications', icon: Bell, type: 'link' },
                       { label: 'Phản hồi & Đánh giá', href: '/dashboard/student/feedback', icon: MessageSquare, type: 'link' },
-                      { label: 'Tiến độ học tập', href: '/dashboard/student/progress', icon: TrendingUp, type: 'link' },
-                      { label: 'Tài liệu học tập', href: '/dashboard/student/materials', icon: BookOpen, type: 'link' },
-                      { label: 'Hỏi đáp', href: '/dashboard/student/qa', icon: HelpCircle, type: 'link' },
-                      { label: 'Cá nhân hóa', href: '/dashboard/student/personalization', icon: Settings, type: 'link' }
+                      { label: 'Xem biên bản', href: '/dashboard/student/progress', icon: TrendingUp, type: 'link' },
+                     
                               ]
              },
              // 3. Các mục đơn khác
@@ -107,7 +105,7 @@ export default function Sidebar() {
              { label: 'Tài liệu học tập', href: '/dashboard/student/materials', icon: BookOpen, type: 'link' },
              { label: 'Không gian hỏi đáp', href: '/dashboard/student/qa', icon: HelpCircle, type: 'link' },
              { label: 'Cá nhân hóa học tập', href: '/dashboard/student/personalization', icon: Settings, type: 'link' },
-             { label: 'Cấu hình thông báo', href: '/dashboard/student/notifications', icon: Bell, type: 'link' },
+             
         ]
     }
 
