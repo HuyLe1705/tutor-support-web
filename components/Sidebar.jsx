@@ -129,8 +129,8 @@ export default function Sidebar() {
             ]
         },
         { label: 'Báo cáo tổng quan', href: '/dashboard/report', icon: BarChart3, type: 'link' },
-        { label: 'Cài đặt thông báo', href: 'dashboard/nofication',icon: BarChart3, type: 'link' },
-        { label: 'Quản lý biên bản', href: 'dashboard/Tutor/report_management',icon: BarChart3, type: 'link' },
+        { label: 'Cài đặt thông báo', href: '/dashboard/nofication',icon: BarChart3, type: 'link' },
+        { label: 'Quản lý biên bản', href: '/dashboard/Tutor/report_management',icon: BarChart3, type: 'link' },
         
       ]
     };

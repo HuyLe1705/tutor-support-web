@@ -1,9 +1,9 @@
 "use client";
 import Header from '@/components/Header';
 import { SESSIONS, MENTEES } from '@/data/mockData';
-import { Filter, Download, FileText, Search } from 'lucide-react';
-import { useState } from 'react';
 
+import { useState } from 'react';
+import { Search, Users  } from 'lucide-react';
 export default function SessionPage() {
   // State giả lập để chọn phiên xem chi tiết
   const [selectedSessionId, setSelectedSessionId] = useState(SESSIONS[0].id);
@@ -146,4 +146,3 @@ export default function SessionPage() {
   );
 }
 
-import { Users } from 'lucide-react'; // Add import for icon used in button
