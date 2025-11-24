@@ -2,7 +2,7 @@
 "use client"; 
 
 import Sidebar from '@/components/Sidebar';
-import { TUTOR_SCHEDULES, TUTOR_INFO } from '@/data/hardcodedData';
+import { TUTOR_SCHEDULES, TUTOR_INFO } from '@/data/mockData';
 import { useState } from 'react';
 
 // Dùng tạm component này để mô phỏng trang

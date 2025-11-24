@@ -6,7 +6,7 @@ export const USER_INFO = {
 };
 
 // Dữ liệu Lịch rảnh (Trang Thiết lập lịch)
-export const SCHEDULES = [
+export const TUTOR_SCHEDULES = [
   { id: 1, day: "Thứ 2", time: "09:00 - 11:00", type: "Offline", location: "Phòng 401 A4" },
   { id: 2, day: "Thứ 3", time: "09:00 - 11:00", type: "Offline", location: "Thư viện" },
   { id: 3, day: "Thứ 5", time: "15:00 - 16:50", type: "Online", location: "Google Meet" },
@@ -73,28 +73,32 @@ export const USERS = [
     username: "sv1", 
     password: "123", 
     name: "Trần Văn Sinh Viên", 
+    department: "Khoa Khoa học và Kỹ thuật Máy tính",
     role: "student", 
-    avatar: "SV" 
+    avatar: "https://png.pngtree.com/png-clipart/20240321/original/pngtree-avatar-job-student-flat-portrait-of-man-png-image_14639684.png" 
   },
   { 
     username: "tutor1", 
     password: "123", 
     name: "Nguyễn Thị Tutor", 
+    department: "Khoa Khoa học và Kỹ thuật Máy tính",
     role: "tutor", 
-    avatar: "TU" 
+    avatar: "https://www.shutterstock.com/image-vector/cute-smiling-teacher-tutor-avatar-260nw-1716676483.jpg" 
   },
   { 
     username: "both1", 
     password: "123", 
     name: "Lê Hoàng Trợ Giảng", 
+    department: "Khoa Khoa học và Kỹ thuật Máy tính",
     role: "mixed", // Vừa là SV vừa là Tutor
-    avatar: "MX" 
+    avatar: "https://png.pngtree.com/png-clipart/20240321/original/pngtree-avatar-job-student-flat-portrait-of-man-png-image_14639684.png" 
   },
   { 
     username: "admin", 
     password: "123", 
     name: "Quản Trị Viên", 
+    department: "Khoa Khoa học và Kỹ thuật Máy tính",
     role: "admin", 
-    avatar: "AD" 
+    avatar: "https://cdn.vectorstock.com/i/1000v/54/90/administrator-avatar-icon-vector-32095490.jpg" 
   }
 ];
