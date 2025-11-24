@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
-
+import { useRouter } from 'next/navigation';
 export default function LoginPage() {
   const { login } = useAuth();
   const [username, setUsername] = useState("");
@@ -60,7 +60,7 @@ export default function LoginPage() {
             
             {/* Link Đăng nhập (Load lại trang này hoặc về root) */}
             <Link href="/login" className="cursor-pointer opacity-80 hover:opacity-100">
-                {language === 'vi' ? 'Đăng nhập' : 'Login'}
+                {language === 'vi' ? 'Admin' : 'Admin'}
             </Link>
         </div>
       </header>
@@ -87,7 +87,7 @@ export default function LoginPage() {
 
             {/* Khung trắng chứa form */}
             <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-100">
-              <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Admin</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Đăng nhập</h3>
               
               <form onSubmit={handleLogin} className="space-y-5">
                 {error && (
@@ -148,7 +148,7 @@ export default function LoginPage() {
                 <div className="mt-4 pt-4 border-t border-dashed border-gray-200 flex justify-center items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
                   <span className="text-[10px] text-gray-400 font-medium">Quick Fill:</span>
                   <button type="button" onClick={() => { setUsername("admin"); setPassword("123"); }} className="text-[10px] bg-gray-100 px-2 py-1 rounded hover:bg-blue-100 text-gray-600 transition">admin_demo</button>
-    
+                 
                 </div>
 
               </form>

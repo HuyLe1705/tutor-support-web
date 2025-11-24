@@ -1,156 +1,230 @@
 "use client";
-import { useState, useEffect } from 'react';
-import Header from '@/components/Header';
-import { Tag, RefreshCw } from 'lucide-react';
+import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+export default function LoginPage() {
+  const { login } = useAuth();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-export default function Dashboard() {
-  // 1. Khai báo State để chứa dữ liệu thật
-  const [data, setData] = useState([]);
-  const [summary, setSummary] = useState({ lastLogin: '...', totalLogins: 0 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [language, setLanguage] = useState("vi"); // 'vi' hoặc 'en'
 
-  // 2. Hàm gọi API
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      // Gọi API chúng ta vừa tạo ở Bước 1
-      const res = await fetch('/api/dashboard');
-      if (!res.ok) throw new Error('Failed to fetch data');
-      
-      const jsonData = await res.json();
-      setData(jsonData.chartData);
-      setSummary(jsonData.summary);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === "vi" ? "en" : "vi");
+  };
+  const handleForgotSubmit = (e) => {
+    e.preventDefault();
+    alert("Hệ thống đã gửi email khôi phục mật khẩu đến bạn!");
+    setShowForgotModal(false);
+  };
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const result = login(username, password);
+    if (!result.success) {
+      setError(result.message);
     }
   };
 
-  // 3. Gọi API khi trang vừa load
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  // Hàm tính chiều cao cột dynamic (Để cột cao nhất luôn full khung)
-  const calculateHeight = (value) => {
-    if (data.length === 0) return 0;
-    const maxValue = Math.max(...data.map(d => d.value));
-    // Quy đổi ra pixel: Giá trị / Max * 150px (chiều cao tối đa muốn hiển thị)
-    return (value / maxValue) * 150; 
-  };
-
   return (
-    // Thêm pt-[60px] để tránh bị Header xanh che mất
-    <div className="flex flex-col min-h-screen bg-[#ECF0F5] font-sans">
+    <div className="min-h-screen bg-[#F0F2F5] flex flex-col font-sans">
+      {/* 1. HEADER: Màu xanh đậm giống Bách Khoa */}
+      <header className="bg-[#003366] h-16 flex items-center px-4 md:px-8 shadow-md">
+        <div className="flex items-center gap-3">
       
-      <Header title="Ứng dụng" />
-
-      <main className="p-6">
-        <div className="mb-4 flex justify-between items-center">
-            <h3 className="text-xl text-gray-700 font-normal">
-                Ứng dụng <span className="text-xs text-gray-400 pl-1">BKPortal</span>
-            </h3>
-            {/* Nút Refresh dữ liệu thật */}
-            <button onClick={fetchData} title="Làm mới dữ liệu" className="p-2 bg-white rounded shadow hover:bg-gray-50 text-gray-600">
-                <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-            </button>
-        </div>
-
-        {/* --- HIỂN THỊ KHI ĐANG LOADING --- */}
-        {loading ? (
-           <div className="h-64 flex items-center justify-center bg-white rounded shadow-sm">
-              <span className="text-gray-500 text-sm">Đang tải dữ liệu thống kê...</span>
-           </div>
-        ) : error ? (
-           <div className="p-4 bg-red-100 text-red-700 rounded">{error}</div>
-        ) : (
-          <div className="flex flex-col lg:flex-row gap-6 items-start">
-            
-            {/* --- 1. BIỂU ĐỒ (DỮ LIỆU THẬT TỪ API) --- */}
-            <div className="flex-1 w-full bg-white border-t-[3px] border-[#3c8dbc] rounded-sm shadow-sm relative animate-fade-in">
-              <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
-                  <h4 className="text-sm font-semibold text-gray-700">Thống kê sử dụng</h4>
-                  <button className="text-gray-400 hover:text-gray-600 font-bold">−</button>
-              </div>
-
-              <div className="p-4">
-                  <p className="text-xs font-bold text-center text-gray-800 mb-6">Thống kê tần suất đăng nhập</p>
-                  
-                  <div className="h-[200px] flex items-end justify-between gap-2 px-4 border-l border-b border-gray-300 relative pb-6 ml-8">
-                      {/* Trục tung (Dynamic theo dữ liệu max) */}
-                      <div className="absolute left-[-35px] top-0 h-full flex flex-col justify-between text-[10px] text-gray-500 font-medium">
-                          {/* Tính toán sơ bộ các mốc trục tung */}
-                          <span>{Math.max(...data.map(d=>d.value))}</span>
-                          <span>{Math.round(Math.max(...data.map(d=>d.value)) / 2)}</span>
-                          <span>0</span>
-                      </div>
-
-                      {/* Lưới ngang */}
-                      <div className="absolute inset-0 flex flex-col justify-between pointer-events-none z-0">
-                          <div className="border-t border-gray-100 w-full h-0"></div>
-                          <div className="border-t border-gray-100 w-full h-0"></div>
-                          <div className="border-t border-gray-100 w-full h-0"></div>
-                      </div>
-
-                      {/* Render Các Cột Từ State Data */}
-                      {data.map((item, index) => (
-                          <div key={index} className="flex flex-col items-center w-full z-10 group relative">
-                              {/* Tooltip */}
-                              <div className="absolute -top-8 bg-black text-white text-[9px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                                  {item.value} lượt
-                              </div>
-                              
-                              {/* Cột màu đỏ - Chiều cao tính toán động */}
-                              <div 
-                                  className="w-full max-w-[15px] md:max-w-[25px] bg-[#dd4b39] hover:opacity-90 transition-all duration-500 cursor-pointer ease-out" 
-                                  style={{ height: `${calculateHeight(item.value)}px` }} 
-                              ></div>
-                              
-                              <span className="text-[9px] text-gray-500 mt-2 whitespace-nowrap">
-                                  {item.month}
-                              </span>
-                          </div>
-                      ))}
-                  </div>
-              </div>
-            </div>
-
-            {/* --- 2. BOX THÔNG TIN (DỮ LIỆU THẬT) --- */}
-            <div className="w-full lg:w-[350px]">
-               <div className="bg-[#00C0EF] text-white flex rounded-sm shadow-sm overflow-hidden min-h-[90px]">
-                  <div className="bg-[#00A7D0] w-[90px] flex items-center justify-center flex-shrink-0">
-                      <Tag size={42} className="text-white opacity-80 -rotate-45" strokeWidth={1.5} />
-                  </div>
-                  
-                  <div className="p-3 flex-1 flex flex-col justify-center">
-                      <span className="block text-[11px] font-bold uppercase opacity-90 tracking-wide">
-                          LƯỢT ĐĂNG NHẬP GẦN NHẤT
-                      </span>
-                      <div className="mt-1">
-                          {/* Hiển thị thời gian từ API */}
-                          <span className="block text-lg font-bold leading-tight">
-                            {summary.lastLogin}
-                          </span>
-                          {/* Hiển thị tổng số từ API */}
-                          <span className="block text-[11px] mt-1 opacity-80 font-medium">
-                              Tổng lượt đăng nhập: {summary.totalLogins}
-                          </span>
-                      </div>
-                  </div>
-              </div>
-              
-              <div className="text-right mt-1">
-                   <span className="text-[10px] text-gray-400 cursor-pointer hover:text-blue-500">
-                      BKPortal Trang chủ
-                   </span>
-              </div>
-            </div>
-
+          <div className="w-10 h-10 bg-white flex items-center justify-center p-1">
+             <img
+              src="https://upload.wikimedia.org/wikipedia/commons/d/de/HCMUT_official_logo.png"
+              alt="Logo HCMUT"
+              />  
           </div>
-        )}
-      </main>
+          <div className="text-white leading-tight">
+             <h1 className="text-xs md:text-sm font-bold uppercase opacity-90">
+                {language === 'vi' ? 'Đại học Quốc gia Thành phố Hồ Chí Minh' : 'Vietnam National University Ho Chi Minh City'}
+             </h1>
+             <h2 className="text-sm md:text-base font-bold uppercase">
+                {language === 'vi' ? 'Trường Đại học Bách Khoa' : 'Ho Chi Minh City University of Technology'}
+             </h2>
+           </div>
+        </div>
+        <div className="ml-auto flex gap-4 text-white text-sm font-medium">
+            {/* Nút chuyển đổi ngôn ngữ */}
+            <button 
+                onClick={toggleLanguage}
+                className="cursor-pointer opacity-80 hover:opacity-100 focus:outline-none"
+            >
+                {language === 'vi' ? 'Ngôn ngữ (Tiếng Việt)' : 'Language (English)'}
+            </button>
+            
+            {/* Link Đăng nhập (Load lại trang này hoặc về root) */}
+            <Link href="/login" className="cursor-pointer opacity-80 hover:opacity-100">
+                {language === 'vi' ? 'Đăng nhập' : 'Login'}
+            </Link>
+        </div>
+      </header>
+
+      {/* 2. MAIN CONTENT */}
+      <div className="flex-1 flex items-center justify-center p-4 md:p-12">
+        <div className="w-full max-w-6xl flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20">
+          
+          {/* CỘT TRÁI: HÌNH ẢNH (To, rõ nét, bo góc nhẹ) */}
+          <div className="hidden md:block w-1/2 h-[500px] shadow-xl rounded-lg overflow-hidden relative">
+             <img 
+                src="https://opportunities-insight.britishcouncil.org/sites/siem/files/styles/event_header/public/images/news/12%20%281%29.jpg.webp?itok=si418eJK" 
+                alt="HCMUT Campus" 
+                className="w-full h-full object-cover"
+              />
+          </div>
+
+          {/* CỘT PHẢI: FORM ĐĂNG NHẬP */}
+          <div className="w-full md:w-[400px] flex flex-col">
+            {/* Tiêu đề nằm ngoài khung trắng */}
+            <h2 className="text-3xl font-bold text-[#0066CC] mb-6 text-center md:text-center">
+              BK Tutor Program
+            </h2>
+
+            {/* Khung trắng chứa form */}
+            <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-100">
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Đăng nhập</h3>
+              
+              <form onSubmit={handleLogin} className="space-y-5">
+                {error && (
+                  <div className="text-red-500 text-xs text-center bg-red-50 p-2 rounded border border-red-200">
+                    {error}
+                  </div>
+                )}
+                
+                <div className="space-y-4">
+                  <div>
+                    {/* Input nền xám nhạt giống ảnh mẫu */}
+                    <input 
+                      type="text" 
+                      placeholder="Tên đăng nhập" 
+                      className="w-full px-4 py-3 bg-[#F3F4F6] border-none rounded-md text-gray-700 placeholder:text-[#030391] focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <input 
+                      type="password" 
+                      placeholder="Mật khẩu" 
+                      className="w-full px-4 py-3 bg-[#F3F4F6] border-none rounded-md text-gray-700 placeholder:text-[#030391] focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input 
+                      type="checkbox" 
+                      className="rounded w-4 h-4 border-gray-300 accent-[#1488D8]" 
+                    />
+                    {language === 'vi' ? 'Ghi nhớ đăng nhập' : 'Remember me'}
+                </label>
+                  <button 
+                    type="button"
+                    onClick={() => setShowForgotModal(true)}
+                    className="text-[#030391] hover:underline focus:outline-none"
+                  >
+                    {language === 'vi' ? 'Quên mật khẩu?' : 'Forgot password?'}
+                  </button>
+                </div>
+                
+                <button 
+                  type="submit" 
+                  className="block w-full bg-[#007ACC] hover:bg-[#006BB3] text-white font-bold py-3 rounded-md text-center shadow transition duration-200"
+                >
+                  Đăng nhập
+                </button>
+
+                {/* Các nút phụ */}
+                <div className="space-y-3 pt-2">
+                <Link 
+                  href="/login/cas" 
+                  className="flex items-center justify-center w-full border border-gray-300 text-gray-700 font-semibold py-2.5 rounded-md hover:bg-gray-50 transition duration-200 bg-white"
+                >
+                  <img 
+                    src="https://upload.wikimedia.org/wikipedia/commons/d/de/HCMUT_official_logo.png" 
+                    alt="Logo HCMUT" 
+                    className="w-5 h-5 mr-3 object-contain"
+                  />
+                  Tài khoản HCMUT
+                </Link>
+                  
+                  <Link 
+                    href="/login/admin" 
+                    className="block w-full border border-gray-300 text-gray-600 font-semibold py-2.5 rounded-md hover:bg-gray-50 text-center transition duration-200 bg-white"
+                  >
+                    Admin
+                  </Link>
+                </div>
+
+                {/* Khu vực Test Nhanh */}
+                <div className="mt-4 pt-4 border-t border-dashed border-gray-200 flex justify-center items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                  <span className="text-[10px] text-gray-400 font-medium">Quick Fill:</span>
+                  <button type="button" onClick={() => { setUsername("sv1"); setPassword("123"); }} className="text-[10px] bg-gray-100 px-2 py-1 rounded hover:bg-blue-100 text-gray-600 transition">SV</button>
+                  <button type="button" onClick={() => { setUsername("tutor1"); setPassword("123"); }} className="text-[10px] bg-gray-100 px-2 py-1 rounded hover:bg-blue-100 text-gray-600 transition">Tutor</button>
+                  <button type="button" onClick={() => { setUsername("both1"); setPassword("123"); }} className="text-[10px] bg-gray-100 px-2 py-1 rounded hover:bg-blue-100 text-gray-600 transition">Mixed</button>
+                </div>
+
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      {showForgotModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-md overflow-hidden animate-fade-in-up">
+            <div className="bg-[#003366] px-6 py-4 flex justify-between items-center">
+              <h3 className="text-white font-bold text-lg">
+                {language === 'vi' ? 'Khôi phục mật khẩu' : 'Reset Password'}
+              </h3>
+              <button onClick={() => setShowForgotModal(false)} className="text-white hover:text-gray-300 text-xl">&times;</button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <p className="text-gray-600 text-sm">
+                {language === 'vi' 
+                  ? 'Vui lòng nhập email hoặc MSSV/MSCB để nhận liên kết đặt lại mật khẩu.' 
+                  : 'Please enter your email or Student/Staff ID to receive a password reset link.'}
+              </p>
+              <form onSubmit={handleForgotSubmit} className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email / ID</label>
+                    <input 
+                      type="text" 
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#003366] focus:outline-none"
+                      placeholder="example@hcmut.edu.vn"
+                    />
+                </div>
+                
+                <div className="flex justify-end gap-3 pt-2">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowForgotModal(false)}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded"
+                  >
+                    {language === 'vi' ? 'Hủy' : 'Cancel'}
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-4 py-2 text-sm font-medium text-white bg-[#007ACC] hover:bg-[#006BB3] rounded shadow"
+                  >
+                    {language === 'vi' ? 'Gửi yêu cầu' : 'Send Request'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

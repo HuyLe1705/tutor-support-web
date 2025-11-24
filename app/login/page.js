@@ -2,13 +2,24 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
-
+import { useRouter } from 'next/navigation';
 export default function LoginPage() {
   const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [language, setLanguage] = useState("vi"); // 'vi' hoặc 'en'
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === "vi" ? "en" : "vi");
+  };
+  const handleForgotSubmit = (e) => {
+    e.preventDefault();
+    alert("Hệ thống đã gửi email khôi phục mật khẩu đến bạn!");
+    setShowForgotModal(false);
+  };
   const handleLogin = (e) => {
     e.preventDefault();
     const result = login(username, password);
@@ -22,7 +33,7 @@ export default function LoginPage() {
       {/* 1. HEADER: Màu xanh đậm giống Bách Khoa */}
       <header className="bg-[#003366] h-16 flex items-center px-4 md:px-8 shadow-md">
         <div className="flex items-center gap-3">
-          {/* Logo giả lập */}
+      
           <div className="w-10 h-10 bg-white flex items-center justify-center p-1">
              <img
               src="https://upload.wikimedia.org/wikipedia/commons/d/de/HCMUT_official_logo.png"
@@ -30,13 +41,27 @@ export default function LoginPage() {
               />  
           </div>
           <div className="text-white leading-tight">
-            <h1 className="text-xs md:text-sm font-bold uppercase opacity-90">Đại học Quốc gia Thành phố Hồ Chí Minh</h1>
-            <h2 className="text-sm md:text-base font-bold uppercase">Trường Đại học Bách Khoa</h2>
-          </div>
+             <h1 className="text-xs md:text-sm font-bold uppercase opacity-90">
+                {language === 'vi' ? 'Đại học Quốc gia Thành phố Hồ Chí Minh' : 'Vietnam National University Ho Chi Minh City'}
+             </h1>
+             <h2 className="text-sm md:text-base font-bold uppercase">
+                {language === 'vi' ? 'Trường Đại học Bách Khoa' : 'Ho Chi Minh City University of Technology'}
+             </h2>
+           </div>
         </div>
         <div className="ml-auto flex gap-4 text-white text-sm font-medium">
-            <span className="cursor-pointer opacity-80 hover:opacity-100">Ngôn ngữ (Tiếng Việt)</span>
-            <span className="cursor-pointer opacity-80 hover:opacity-100">Đăng nhập</span>
+            {/* Nút chuyển đổi ngôn ngữ */}
+            <button 
+                onClick={toggleLanguage}
+                className="cursor-pointer opacity-80 hover:opacity-100 focus:outline-none"
+            >
+                {language === 'vi' ? 'Ngôn ngữ (Tiếng Việt)' : 'Language (English)'}
+            </button>
+            
+            {/* Link Đăng nhập (Load lại trang này hoặc về root) */}
+            <Link href="/login" className="cursor-pointer opacity-80 hover:opacity-100">
+                {language === 'vi' ? 'Đăng nhập' : 'Login'}
+            </Link>
         </div>
       </header>
 
@@ -96,14 +121,18 @@ export default function LoginPage() {
                 <div className="flex items-center justify-between text-sm text-gray-600">
                 <label className="flex items-center gap-2 cursor-pointer select-none">
                   <input 
-                    type="checkbox" 
-                    className="rounded w-4 h-4 border-gray-300 accent-[#1488D8]" 
-                  />
-                  Ghi nhớ đăng nhập
+                      type="checkbox" 
+                      className="rounded w-4 h-4 border-gray-300 accent-[#1488D8]" 
+                    />
+                    {language === 'vi' ? 'Ghi nhớ đăng nhập' : 'Remember me'}
                 </label>
-                  <Link href="#" className="text-[#030391] hover:underline">
-                    Quên mật khẩu
-                  </Link>
+                  <button 
+                    type="button"
+                    onClick={() => setShowForgotModal(true)}
+                    className="text-[#030391] hover:underline focus:outline-none"
+                  >
+                    {language === 'vi' ? 'Quên mật khẩu?' : 'Forgot password?'}
+                  </button>
                 </div>
                 
                 <button 
@@ -149,6 +178,53 @@ export default function LoginPage() {
 
         </div>
       </div>
+      {showForgotModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-md overflow-hidden animate-fade-in-up">
+            <div className="bg-[#003366] px-6 py-4 flex justify-between items-center">
+              <h3 className="text-white font-bold text-lg">
+                {language === 'vi' ? 'Khôi phục mật khẩu' : 'Reset Password'}
+              </h3>
+              <button onClick={() => setShowForgotModal(false)} className="text-white hover:text-gray-300 text-xl">&times;</button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <p className="text-gray-600 text-sm">
+                {language === 'vi' 
+                  ? 'Vui lòng nhập email hoặc MSSV/MSCB để nhận liên kết đặt lại mật khẩu.' 
+                  : 'Please enter your email or Student/Staff ID to receive a password reset link.'}
+              </p>
+              <form onSubmit={handleForgotSubmit} className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email / ID</label>
+                    <input 
+                      type="text" 
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#003366] focus:outline-none"
+                      placeholder="example@hcmut.edu.vn"
+                    />
+                </div>
+                
+                <div className="flex justify-end gap-3 pt-2">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowForgotModal(false)}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded"
+                  >
+                    {language === 'vi' ? 'Hủy' : 'Cancel'}
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-4 py-2 text-sm font-medium text-white bg-[#007ACC] hover:bg-[#006BB3] rounded shadow"
+                  >
+                    {language === 'vi' ? 'Gửi yêu cầu' : 'Send Request'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

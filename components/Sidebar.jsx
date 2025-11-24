@@ -94,7 +94,7 @@ export default function Sidebar() {
                       { label: 'Hủy chỗ', href: '/dashboard/student/cancel', icon: XCircle, type: 'link' },
                       { label: 'Cấu hình kênh/tần suất thông báo', href: '/dashboard/student/notifications', icon: Bell, type: 'link' },
                       { label: 'Phản hồi & Đánh giá', href: '/dashboard/student/feedback', icon: MessageSquare, type: 'link' },
-                      { label: 'Xem biên bản', href: '/dashboard/student/progress', icon: TrendingUp, type: 'link' },
+                      { label: 'Xem biên bản', href: '/dashboard/student/report', icon: TrendingUp, type: 'link' },
                      
                               ]
              },
@@ -130,7 +130,10 @@ export default function Sidebar() {
                 { label: 'Điểm danh', href: '/dashboard/attendance' },
             ]
         },
-        { label: 'Báo cáo tổng quan', href: '/dashboard/report', icon: BarChart3, type: 'link' }
+        { label: 'Báo cáo tổng quan', href: '/dashboard/report', icon: BarChart3, type: 'link' },
+        { label: 'Cài đặt thông báo', href: 'dashboard/nofication',icon: BarChart3, type: 'link' },
+        { label: 'Quản lý biên bản', href: 'dashboard/Tutor/report_management',icon: BarChart3, type: 'link' },
+        
       ]
     };
 
