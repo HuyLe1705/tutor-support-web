@@ -19,10 +19,12 @@ export const SESSIONS = [
     title: "Giới thiệu về Phát triển Web", 
     time: "2024-07-20 10:00", 
     format: "Trực tuyến", 
-    status: "Đã diễn ra", 
+    status: "Sắp tới", 
     current: 15, 
     max: 20,
-    action: "view"
+    action: "view",
+    location:"H6-110",
+    tutor:"tutor1"
   },
   { 
     id: "S002", 
@@ -32,7 +34,9 @@ export const SESSIONS = [
     status: "Sắp tới", 
     current: 10, 
     max: 15,
-    action: "view"
+    action: "view",
+    location:"H6-410",
+    tutor:"tutor1"
   },
   { 
     id: "S003", 
@@ -42,7 +46,9 @@ export const SESSIONS = [
     status: "Sắp tới", 
     current: 20, 
     max: 20,
-    action: "view"
+    action: "view",
+    location:"Google meet",
+    tutor:"tutor1"
   }
 ];
 
