@@ -1,0 +1,58 @@
+{
+    "personalInfo": {
+        "studentId": "12345678",
+        "lastName": "Trần Văn Sinh",
+        "firstName": "Viên",
+        "dateOfBirth": "10/10/2005",
+        "gender": "Nam",
+        "idNumber": "127450712405",
+        "idIssueDate": "17/06/2022",
+        "idIssuePlace": "Thành phố Hồ Chí Minh"
+    },
+    "contactInfo": {
+        "phone": "1252145245",
+        "studentEmail": "tester@hcmut.edu.vn",
+        "contactEmail": "tester@gmail.com",
+        "backupEmail": "*"
+    },
+    "educationInfo": {
+        "faculty": "Khoa Khoa học và Kỹ thuật Máy tính",
+        "managementUnit": "Khoa Khoa học và Kỹ thuật Máy tính",
+        "classCode": "MT",
+        "enrollmentDate": "08/2023",
+        "curriculumYear": "2023",
+        "extensionSemesters": "--",
+        "reducedSemesters": "--",
+        "standardSemesters": "8",
+        "maxSemesters": "12",
+        "startingSemester": "--",
+        "standardEndSemester": "20262",
+        "maxEndSemester": "20282",
+        "standardGraduationDate": "10/2027",
+        "maxGraduationDate": "10/2029",
+        "degreeLevel": "Đại học",
+        "trainingSystem": "Chính quy",
+        "major": "Chuyên ngành: KHM - Khoa học Máy tính",
+        "trainingType": "Chính tắc",
+        "program": "Chương trình Đại học tiêu chuẩn",
+        "campus": "ĐHBK Cơ Sở 2 - Đông Hoà",
+        "location": "--",
+        "session": "--",
+        "status": "Đang học"
+    },
+    "graduationInfo": {
+        "major": "-- - --",
+        "academicYear": "--",
+        "decisionNumber": "--",
+        "decisionDate": "--"
+    },
+    "accountInfo": {
+        "bknetAccount": "--",
+        "bankAccountNumber": "--",
+        "bankName": "--",
+        "ocbCif": "--"
+    },
+    "otherInfo": {
+        "notes": "--"
+    }
+}
