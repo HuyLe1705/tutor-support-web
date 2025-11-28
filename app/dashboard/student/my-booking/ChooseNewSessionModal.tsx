@@ -3,30 +3,55 @@
 import { useState, useEffect } from "react";
 import { Search, ChevronLeft, ChevronRight, X as XIcon } from "lucide-react";
 
-// Type Session của phần my-booking
 import { Session } from "@/data/sessions_mentee";
-// Data ghép cặp & data phiên tutor (mock)
 import { mockMenteePairings } from "@/data/ghep_cap";
 import { SESSIONS } from "@/data/mockData";
 
 interface ChooseNewSessionModalProps {
   open: boolean;
   sessionToChange: Session | null;
-  studentUsername: string; // username sinh viên hiện tại
+  studentUsername: string | undefined; // username sinh viên hiện tại
+  studentUpcomingSessions: Session[];  // ✅ CÁC PHIÊN SẮP TỚI CỦA SV (DÙNG CHECK XUNG ĐỘT)
   onClose: () => void;
   onChoose: (oldSession: Session, newSession: Session) => void;
+}
+
+/* ========= HELPER CHECK XUNG ĐỘT THỜI GIAN (THEO KHOẢNG) ========== */
+
+type SimpleRange = {
+  date: string;  // "YYYY-MM-DD"
+  start: string; // "HH:MM"
+  end: string;   // "HH:MM"
+};
+
+// Parse chuỗi "YYYY-MM-DD HH:MM - HH:MM"
+function parseSimpleRange(timeStr: string): SimpleRange | null {
+  if (!timeStr) return null;
+  const parts = timeStr.split(" ");
+  if (parts.length < 4) return null;
+
+  const [date, start, , end] = parts; // bỏ dấu "-"
+  if (!date || !start || !end) return null;
+
+  return { date, start, end };
+}
+
+// Kiểm tra 2 khoảng thời gian có overlap không (cùng ngày)
+function isTimeConflict(a: SimpleRange, b: SimpleRange): boolean {
+  if (a.date !== b.date) return false;
+  const noOverlap = a.end <= b.start || b.end <= a.start;
+  return !noOverlap;
 }
 
 export function ChooseNewSessionModal({
   open,
   sessionToChange,
   studentUsername,
+  studentUpcomingSessions,
   onClose,
   onChoose,
 }: ChooseNewSessionModalProps) {
-  if (!open || !sessionToChange) return null;
-
-  // ===== STATE UI =====
+  // ================== HOOKS (luôn gọi, KHÔNG phụ thuộc open) ==================
   const [search, setSearch] = useState<string>("");
   const [timeFilter, setTimeFilter] = useState<string>("all");
   const [topicFilter, setTopicFilter] = useState<string>("all");
@@ -39,7 +64,7 @@ export function ChooseNewSessionModal({
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  // ===== HELPER: số chỗ còn lại =====
+  // ================== HELPER ==================
   const getRemainingSlots = (s: any): string | number => {
     if (s.remaining != null) return s.remaining;
     if (s.slotsRemaining != null) return s.slotsRemaining;
@@ -49,7 +74,6 @@ export function ChooseNewSessionModal({
     return "-";
   };
 
-  // ===== HELPER: màu status (status đang là tiếng Việt trong mockData) =====
   const getStatusClass = (status: string): string => {
     switch (status) {
       case "Sắp tới":
@@ -64,7 +88,25 @@ export function ChooseNewSessionModal({
     }
   };
 
-  // ===== 1. TÌM TUTOR CỦA SINH VIÊN (từ file ghep_cap.ts) =====
+  const mapRawToSession = (raw: any): Session => {
+    const statusText: string = raw.status || "Sắp tới";
+    let statusInternal: any = "sap_toi";
+    if (statusText === "Đã diễn ra" || statusText === "Hoàn thành")
+      statusInternal = "hoan_thanh";
+    if (statusText === "Đã hủy") statusInternal = "da_huy";
+
+    return {
+      ...(raw as any),
+      code: raw.code || raw.id || "",
+      title: raw.title || "",
+      time: raw.time || "",
+      method: raw.method || raw.format || "",
+      location: raw.location || "",
+      status: statusInternal,
+    } as Session;
+  };
+
+  // ================== TÌM TUTOR & THÔNG TIN PHIÊN HIỆN TẠI ==================
   const pairing = (mockMenteePairings as any[]).find(
     (p) =>
       p.studentUsername === studentUsername ||
@@ -72,77 +114,42 @@ export function ChooseNewSessionModal({
       p.username === studentUsername
   );
 
-  const fallbackTutorFromSession =
-    (sessionToChange as any).tutor ||
-    (sessionToChange as any).tutorUsername ||
-    (sessionToChange as any).tutorId ||
-    null;
+  let fallbackTutorFromSession: string | null = null;
+  let currentCode: string | null = null;
 
-  const currentTutor =
+  if (sessionToChange) {
+    const anySession = sessionToChange as any;
+    fallbackTutorFromSession =
+      anySession.tutor || anySession.tutorUsername || anySession.tutorId || null;
+
+    currentCode =
+      anySession.code || anySession.id || anySession.sessionId || null;
+  }
+
+  const currentTutor: string | null =
     (pairing
       ? pairing.tutorUsername || pairing.tutorId || pairing.tutor
       : null) || fallbackTutorFromSession;
 
-  // Nếu vẫn không tìm ra tutor ⇒ báo lỗi đơn giản
-  if (!currentTutor) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-        <div className="w-full max-w-md rounded-lg bg-white px-6 py-5 shadow-lg">
-          <div className="mb-4 flex items-start justify-between">
-            <h2 className="text-[15px] font-semibold text-gray-900">
-              Chọn phiên mới
-            </h2>
-            <button
-              className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-              onClick={onClose}
-            >
-              <XIcon className="h-4 w-4" />
-            </button>
-          </div>
-          <p className="text-sm text-gray-700">
-            Không tìm được tutor đang ghép cặp cho sinh viên hiện tại, nên
-            không thể tải danh sách phiên mới. Vui lòng kiểm tra lại dữ liệu
-            ghép cặp (ghep_cap.ts).
-          </p>
-          <div className="mt-6 flex justify-end">
-            <button
-              className="rounded bg-indigo-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-indigo-700"
-              onClick={onClose}
-            >
-              Đóng
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+  // ================== LỌC PHIÊN CỦA TUTOR TRONG mock SESSIONS ==================
+  let baseSessions: any[] = [];
+
+  if (currentTutor) {
+    baseSessions = (SESSIONS as any[]).filter((s) => {
+      const tutorOfSession = s.tutor || s.tutorId || s.tutorUsername;
+      if (tutorOfSession !== currentTutor) return false;
+
+      const codeOfS = s.code || s.id || s.sessionId;
+      if (currentCode && codeOfS === currentCode) return false; // ❗ không cho chọn lại chính nó
+
+      // chỉ lấy phiên "Sắp tới"
+      if (s.status && s.status !== "Sắp tới") return false;
+
+      return true;
+    });
   }
 
-  // ===== 2. LỌC CÁC PHIÊN CỦA TUTOR ĐÓ (từ mockData.SESSIONS) =====
-  // mockData.SESSIONS: mỗi item kiểu { id, title, time, format, status, current, max, action, location, tutor }
-  const baseSessions = (SESSIONS as any[]).filter((s) => {
-    // cùng tutor
-    const tutorOfSession = s.tutor || s.tutorId || s.tutorUsername;
-    if (tutorOfSession !== currentTutor) return false;
-
-    // loại phiên hiện tại (tránh đổi sang chính nó)
-    const codeOfCurrent =
-      (sessionToChange as any).code ||
-      (sessionToChange as any).id ||
-      (sessionToChange as any).sessionId;
-    const codeOfS = s.code || s.id || s.sessionId;
-
-    if (codeOfS === codeOfCurrent) return false;
-
-    // nếu status trong mock là "Sắp tới" / "Đã diễn ra" ...
-    if (s.status && s.status !== "Sắp tới") {
-      // chỉ lấy phiên sắp tới (có thể sửa nếu bạn muốn lấy tất cả)
-      return false;
-    }
-
-    return true;
-  });
-
-  // ===== 3. OPTION FILTER =====
+  // ================== OPTION FILTER ==================
   const uniqueDates = Array.from(
     new Set(
       baseSessions.map((s: any) => {
@@ -158,7 +165,7 @@ export function ChooseNewSessionModal({
     new Set(baseSessions.map((s: any) => s.format || s.method))
   );
 
-  // ===== 4. FILTER THEO Ô LỌC + SEARCH =====
+  // ================== FILTER THEO Ô LỌC + SEARCH ==================
   const filtered = baseSessions.filter((s: any) => {
     if (activeTab === "hoan_thanh" && s.status !== "Hoàn thành") return false;
     if (activeTab === "sap_toi" && s.status && s.status !== "Sắp tới")
@@ -175,10 +182,26 @@ export function ChooseNewSessionModal({
     const methodOfS = s.format || s.method || "";
     if (methodFilter !== "all" && methodOfS !== methodFilter) return false;
 
-    if (avoidConflict) {
-      // demo: loại xung đột nếu trùng chuỗi time với phiên đang đổi
-      const timeOfCurrent = (sessionToChange as any).time || "";
-      if (s.time === timeOfCurrent) return false;
+    // ✅ LOẠI BỎ XUNG ĐỘT LỊCH CÁ NHÂN (KHÔNG TÍNH PHIÊN HIỆN TẠI)
+    if (avoidConflict && studentUpcomingSessions?.length > 0) {
+      const candidateRange = parseSimpleRange(s.time || "");
+      if (candidateRange) {
+        const hasConflict = studentUpcomingSessions.some((booked) => {
+          // ❗ BỎ PHIÊN ĐANG ĐỔI (session hiện tại) KHI CHECK
+          if (
+            sessionToChange &&
+            booked.code === sessionToChange.code &&
+            booked.time === sessionToChange.time
+          ) {
+            return false;
+          }
+
+          const bookedRange = parseSimpleRange(booked.time || "");
+          return bookedRange ? isTimeConflict(candidateRange, bookedRange) : false;
+        });
+
+        if (hasConflict) return false;
+      }
     }
 
     if (search.trim()) {
@@ -195,7 +218,7 @@ export function ChooseNewSessionModal({
     return true;
   });
 
-  // ===== 5. PHÂN TRANG =====
+  // ================== PHÂN TRANG ==================
   const totalRows = filtered.length;
   const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
 
@@ -222,27 +245,48 @@ export function ChooseNewSessionModal({
     setCurrentPage((p) => Math.min(totalPages, p + 1));
   };
 
-  // ===== HELPER: MAP RAW SESSION → Session (để callback onChoose) =====
-  const mapRawToSession = (raw: any): Session => {
-    // Bạn có thể chỉnh lại mapping này cho đúng với interface Session thực tế
-    const statusText: string = raw.status || "Sắp tới";
-    let statusInternal: any = "sap_toi";
-    if (statusText === "Đã diễn ra" || statusText === "Hoàn thành")
-      statusInternal = "hoan_thanh";
-    if (statusText === "Đã hủy") statusInternal = "da_huy";
+  // ================== CÁC NHÁNH RETURN (sau khi HOOKS đã chạy) ==================
 
-    return {
-      ...(raw as any),
-      code: raw.code || raw.id || "",
-      title: raw.title || "",
-      time: raw.time || "",
-      method: raw.method || raw.format || "",
-      location: raw.location || "",
-      status: statusInternal,
-    } as Session;
-  };
+  // Không mở hoặc chưa có session cần đổi → không render gì
+  if (!open || !sessionToChange) {
+    return null;
+  }
 
-  // ===== 6. RENDER MODAL =====
+  // Không tìm được tutor → hiện modal báo lỗi
+  if (!currentTutor) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+        <div className="w-full max-w-md rounded-lg bg-white px-6 py-5 shadow-lg">
+          <div className="mb-4 flex items-start justify-between">
+            <h2 className="text-[15px] font-semibold text-gray-900">
+              Chọn phiên mới
+            </h2>
+            <button
+              className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              onClick={onClose}
+            >
+              <XIcon className="h-4 w-4" />
+            </button>
+          </div>
+          <p className="text-sm text-gray-700">
+            Không tìm được tutor đang ghép cặp cho sinh viên hiện tại, nên
+            không thể tải danh sách phiên mới. Vui lòng kiểm tra lại dữ liệu
+            ghép cặp (<code>ghep_cap.ts</code>).
+          </p>
+          <div className="mt-6 flex justify-end">
+            <button
+              className="rounded bg-indigo-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-indigo-700"
+              onClick={onClose}
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ================== RENDER MODAL CHÍNH ==================
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
       <div className="w-full max-w-4xl rounded-lg bg-white px-6 py-5 shadow-lg">
@@ -472,14 +516,14 @@ export function ChooseNewSessionModal({
               <div className="flex items-center gap-1">
                 <button
                   onClick={handlePrevPage}
-                  disabled={currentPage === 1 || totalPages === 0}
+                  disabled={currentPage === 1 || totalRows === 0}
                   className="inline-flex h-6 w-6 items-center justify-center rounded border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <ChevronLeft className="h-3 w-3" />
                 </button>
                 <button
                   onClick={handleNextPage}
-                  disabled={currentPage === totalPages || totalPages === 0}
+                  disabled={currentPage === totalPages || totalRows === 0}
                   className="inline-flex h-6 w-6 items-center justify-center rounded border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <ChevronRight className="h-3 w-3" />
