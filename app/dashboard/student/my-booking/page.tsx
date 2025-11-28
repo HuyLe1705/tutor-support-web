@@ -1,16 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  X as XIcon,
-} from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, X as XIcon } from "lucide-react";
 
+import { useSessions } from "@/context/SessionsContext";
 import { useAuth } from "@/context/AuthContext";
 import {
-  mockSessions,
   Session,
   SessionStatus,
 } from "../../../../data/sessions_mentee";
@@ -18,20 +13,59 @@ import { ChooseNewSessionModal } from "./ChooseNewSessionModal";
 
 type ActionType = "reschedule" | "cancel" | null;
 
-// Dữ liệu gốc từ mock
-const ALL_SESSIONS: Session[] = mockSessions;
+/* =========================================================
+   HELPER CHO LOGIC ĐỔI PHIÊN
+========================================================= */
+
+type SimpleRange = {
+  date: string;
+  start: string; // "HH:MM"
+  end: string;   // "HH:MM"
+};
+
+// Parse "2024-05-11 14:00 - 15:30" -> { date, start, end }
+function parseSimpleRange(timeStr: string): SimpleRange | null {
+  if (!timeStr) return null;
+  const parts = timeStr.split(" ");
+  if (parts.length < 4) return null;
+
+  const [date, start, , end] = parts;
+  if (!date || !start || !end) return null;
+
+  return { date, start, end };
+}
+
+// So sánh time range theo chuỗi "HH:MM" (đã padding 0)
+function isTimeConflict(a: SimpleRange, b: SimpleRange): boolean {
+  if (a.date !== b.date) return false;
+  const noOverlap = a.end <= b.start || b.end <= a.start;
+  return !noOverlap;
+}
+
+// Lấy số slot còn lại nếu data có các field liên quan
+function getRemainingFromSession(s: any): number | null {
+  if (typeof s.remaining === "number") return s.remaining;
+  if (typeof s.slotsRemaining === "number") return s.slotsRemaining;
+  if (typeof s.max === "number" && typeof s.current === "number") {
+    return s.max - s.current;
+  }
+  return null;
+}
+
+/* =========================================================
+   COMPONENT CHÍNH
+========================================================= */
 
 export default function MyBookingPage() {
   const { user } = useAuth();
   const username: string | undefined = (user as any)?.username;
 
-  // ================== DỮ LIỆU PHIÊN ĐỘNG (GIẢ LẬP DB) ==================
-  const [sessionList, setSessionList] = useState<Session[]>(ALL_SESSIONS);
+  // ✅ Lấy sessionList dùng chung từ Context
+  const { sessionList, setSessionList } = useSessions();
 
   // ================== STATE LIST CHÍNH ==================
-  const [activeTab, setActiveTab] = useState<"sap_toi" | "hoan_thanh" | "da_huy">(
-    "sap_toi"
-  );
+  const [activeTab, setActiveTab] =
+    useState<"sap_toi" | "hoan_thanh" | "da_huy">("sap_toi");
   const [search, setSearch] = useState("");
 
   const [timeFilter, setTimeFilter] = useState<string>("all");
@@ -64,6 +98,15 @@ export default function MyBookingPage() {
     ? sessionList.filter((s) => s.username === username)
     : sessionList;
 
+  // ================== DANH SÁCH PHIÊN SẮP TỚI CỦA SV (DÙNG ĐỂ CHECK XUNG ĐỘT) ==================
+  const myUpcomingForConflict: Session[] = username
+    ? sessionList.filter(
+        (s) =>
+          s.username === username &&
+          (s.status === "sap_toi" || s.status === "cho_xac_nhan")
+      )
+    : [];
+
   // ================== FILTER CHO LIST CHÍNH ==================
   const uniqueDates = Array.from(
     new Set(
@@ -77,13 +120,13 @@ export default function MyBookingPage() {
   const uniqueMethods = Array.from(new Set(SESSIONS.map((s) => s.method)));
 
   const filteredSessions = SESSIONS.filter((s) => {
-    // Tab "Hoàn thành" → chỉ hiển thị phiên đã hoàn thành
+    // Tab "Hoàn thành"
     if (activeTab === "hoan_thanh" && s.status !== "hoan_thanh") return false;
 
-    // Tab "Đã hủy" → chỉ hiển thị phiên đã hủy
+    // Tab "Đã hủy"
     if (activeTab === "da_huy" && s.status !== "da_huy") return false;
 
-    // Tab "Sắp tới" → CHỈ hiển thị Sắp tới + Chờ xác nhận (KHÔNG gồm "da_huy")
+    // Tab "Sắp tới" → chỉ Sắp tới + Chờ xác nhận
     if (
       activeTab === "sap_toi" &&
       !["sap_toi", "cho_xac_nhan"].includes(s.status)
@@ -164,7 +207,7 @@ export default function MyBookingPage() {
     setCancelError(null);
   };
 
-  // Xác nhận hủy chỗ → đổi trạng thái sang "da_huy" trong sessionList
+  // Xác nhận hủy chỗ → đổi trạng thái sang "da_huy"
   const handleConfirmCancel = () => {
     if (!confirmAction.session || confirmAction.type !== "cancel") return;
 
@@ -175,12 +218,11 @@ export default function MyBookingPage() {
 
     console.log("Hủy chỗ", confirmAction.session.code, cancelReason);
 
-    // Giả lập API: cập nhật trạng thái trong state
-    setSessionList((prev) =>
-      prev.map((item) =>
+    setSessionList((prev: Session[]): Session[] =>
+      prev.map((item): Session =>
         item.code === confirmAction.session!.code &&
         (!username || item.username === username)
-          ? { ...item, status: "da_huy" }
+          ? { ...item, status: "da_huy" as SessionStatus }
           : item
       )
     );
@@ -214,49 +256,73 @@ export default function MyBookingPage() {
     setCurrentPage((prev) => Math.min(totalPages, prev + 1));
   };
 
-  // callback khi chọn xong 1 phiên mới trong popup 2
-  const handleChooseNewSession = (target: Session) => {
-    if (!sessionToChange) return;
+  // ================== CALLBACK ĐỔI PHIÊN (NHẬN TỪ MODAL) ==================
+  const handleChooseNewSession = (oldSession: Session, target: Session) => {
+    if (!username) return;
 
     console.log(
       "Đổi từ phiên",
-      sessionToChange.code,
+      oldSession.code,
       "sang phiên",
       target.code
     );
 
-    // Giả lập API đổi phiên:
-    // 1) phiên cũ -> da_huy
-    // 2) thêm / cập nhật phiên mới cho sinh viên hiện tại, status sap_toi
-    setSessionList((prev) => {
-      const updated = prev.map((item) =>
-        item.code === sessionToChange.code &&
-        (!username || item.username === username)
-          ? { ...item, status: "da_huy" }
+    // 1) Check còn slot ở phiên mới
+    const remaining = getRemainingFromSession(target as any);
+    if (remaining !== null && remaining <= 0) {
+      alert("Phiên mới đã đủ số lượng, bạn không thể đổi sang phiên này.");
+      return;
+    }
+
+    // 2) Check xung đột lịch với các phiên sắp tới khác (bỏ phiên cũ)
+    const rangeNew = parseSimpleRange(target.time || "");
+    if (rangeNew) {
+      const myUpcoming = myUpcomingForConflict.filter(
+        (s) => !(s.code === oldSession.code && s.time === oldSession.time)
+      );
+
+      const conflict = myUpcoming.some((b) => {
+        const r = parseSimpleRange(b.time);
+        return r && isTimeConflict(rangeNew, r);
+      });
+
+      if (conflict) {
+        alert(
+          "Phiên mới bị trùng thời gian với một phiên khác bạn đã đăng ký. Vui lòng chọn phiên khác."
+        );
+        return;
+      }
+    }
+
+    // 3) Không xung đột + còn slot → cập nhật sessionList
+    setSessionList((prev: Session[]): Session[] => {
+      // 3.1) Phiên cũ -> đã hủy
+      const updated: Session[] = prev.map((item): Session =>
+        item.code === oldSession.code && item.username === username
+          ? { ...item, status: "da_huy" as SessionStatus }
           : item
       );
 
-      // Nếu đã có dòng cho target + username rồi thì chỉ update status
+      // 3.2) Kiểm tra xem user đã có bản ghi với phiên target chưa
       const idxExisting = updated.findIndex(
-        (item) =>
-          item.code === target.code &&
-          (!username || item.username === username)
+        (item) => item.code === target.code && item.username === username
       );
 
       if (idxExisting !== -1) {
+        // Đã có bản ghi → mở lại thành "Sắp tới"
+        const existing = updated[idxExisting];
         updated[idxExisting] = {
-          ...updated[idxExisting],
-          status: "sap_toi",
-          username: username || updated[idxExisting].username,
+          ...existing,
+          status: "sap_toi" as SessionStatus,
         };
         return updated;
       }
 
-      // Nếu chưa có thì thêm dòng mới
+      // 3.3) Chưa có → thêm bản ghi mới
       const newBooking: Session = {
         ...target,
-        username: username || target.username,
-        status: "sap_toi",
+        username,
+        status: "sap_toi" as SessionStatus,
       };
 
       return [...updated, newBooking];
@@ -664,11 +730,12 @@ export default function MyBookingPage() {
         </div>
       )}
 
-      {/* POPUP 2: CHỌN PHIÊN MỚI (file riêng) */}
+      {/* POPUP 2: CHỌN PHIÊN MỚI */}
       <ChooseNewSessionModal
         open={chooseNewOpen}
         sessionToChange={sessionToChange}
-        studentUsername={username || ""} // truyền username sinh viên
+        studentUsername={username}
+        studentUpcomingSessions={myUpcomingForConflict}
         onClose={closeChooseNew}
         onChoose={handleChooseNewSession}
       />
