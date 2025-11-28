@@ -108,3 +108,33 @@ export const USERS = [
     avatar: "https://cdn.vectorstock.com/i/1000v/54/90/administrator-avatar-icon-vector-32095490.jpg" 
   }
 ];
+
+export const REPORT = [
+  {
+    id: "S001",
+    title: "Buổi học 1: Nhập môn",
+    studentCount: 32,
+    time: "10/10/2025 - 14:00",
+    avgScore: 8.2,
+    status: "Hoàn thành",
+    note: "Buổi học diễn ra suôn sẻ."
+  },
+  {
+    id: "S002",
+    title: "Buổi học 2: OOP",
+    studentCount: 28,
+    time: "15/10/2025 - 18:00",
+    avgScore: 7.6,
+    status: "Đang diễn ra",
+    note: ""
+  },
+  {
+    id: "S003",
+    title: "Buổi học 3: CTDL & GT",
+    studentCount: 30,
+    time: "20/10/2025 - 14:00",
+    avgScore: null,
+    status: "Chưa bắt đầu",
+    note: "Chờ sinh viên đăng ký thêm."
+  }
+];
