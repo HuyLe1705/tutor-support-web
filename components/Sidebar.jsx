@@ -93,7 +93,8 @@ export default function Sidebar() {
                      
                       { label: 'Đăng kí chương trình', href: '/dashboard/student/register', icon: PenTool, type: 'link' },
                       { label: 'Đăng ký của tôi', href: '/dashboard/student/my-registration', icon: CheckSquare, type: 'link' },
-                      { label: 'Tìm kiếm Tutor/Phiên', href: '/dashboard/student/search', icon: Search, type: 'link' },
+                      { label: 'Tìm kiếm Tutor', href: '/dashboard/student/search', icon: Search, type: 'link' },
+                      { label: 'Danh sách các phiên khả dụng', href: '/dashboard/student/search_session', icon: Search, type: 'link' },
                       { label: 'Danh sách các phiên đã đăng ký', href: '/dashboard/student/my-booking', icon: Calendar, type: 'link' },
                       { label: 'Cấu hình kênh/tần suất thông báo', href: '/dashboard/student/notifications', icon: Bell, type: 'link' },
                       { label: 'Xem biên bản', href: '/dashboard/student/report', icon: TrendingUp, type: 'link' },
