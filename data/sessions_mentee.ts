@@ -20,7 +20,7 @@ export const mockSessions: Session[] = [
   {
     code: "CS101",
     title: "Giới thiệu về Lập trình",
-    time: "2024-06-11 10:00 - 11:30",
+    time: "2024-07-20 10:00 - 12:00",
     method: "Trực tuyến",
     location: "Google Meet",
     status: "sap_toi",
@@ -150,4 +150,149 @@ export async function cancelSessionMock(
   });
 
   return mockSessions[index];
+}
+
+import { SESSIONS } from "./mockData";
+
+// ---- Helper check xung đột thời gian ----
+type SimpleRange = {
+  date: string;  // "2024-05-10"
+  start: string; // "10:00"
+  end: string;   // "11:00"
+};
+
+function parseSimpleRange(timeStr: string): SimpleRange | null {
+  if (!timeStr) return null;
+  const parts = timeStr.split(" ");
+  if (parts.length < 4) return null;
+  const [date, start, , end] = parts;
+  if (!date || !start || !end) return null;
+  return { date, start, end };
+}
+
+function isTimeConflict(a: SimpleRange, b: SimpleRange): boolean {
+  if (a.date !== b.date) return false;
+  const noOverlap = a.end <= b.start || b.end <= a.start;
+  return !noOverlap;
+}
+
+export interface BookSessionResult {
+  ok: boolean;
+  error?: string;
+  booking?: Session;
+}
+
+/**
+ * API giả lập đặt chỗ:
+ *  - Kiểm tra tồn tại phiên (trong mockData.SESSIONS)
+ *  - Kiểm tra sức chứa
+ *  - Kiểm tra xung đột lịch với các phiên sắp tới của sinh viên
+ *  - Nếu OK -> tạo booking mới trong mockSessions, cập nhật sức chứa trong SESSIONS
+ */
+export async function bookSessionMock(
+  sessionCode: string,
+  username: string
+): Promise<BookSessionResult> {
+  // delay nhẹ cho giống gọi API
+  await new Promise((resolve) => setTimeout(resolve, 400));
+
+  if (!username) {
+    return { ok: false, error: "Không xác định được tài khoản sinh viên." };
+  }
+
+  // 1. Tìm phiên trong mockData.SESSIONS
+  const rawSessions = SESSIONS as any[];
+  const indexSession = rawSessions.findIndex(
+    (s) => (s.code || s.id || s.sessionId) === sessionCode
+  );
+
+  if (indexSession === -1) {
+    return { ok: false, error: "Không tìm thấy phiên cần đặt chỗ." };
+  }
+
+  const tpl = rawSessions[indexSession];
+
+  // 2. Tính sức chứa còn lại
+  let max: number | null =
+    typeof tpl.max === "number" ? tpl.max : null;
+  let current: number | null =
+    typeof tpl.current === "number" ? tpl.current : null;
+
+  let remaining: number | null = null;
+  if (typeof tpl.remaining === "number") {
+    remaining = tpl.remaining;
+  } else if (typeof tpl.slotsRemaining === "number") {
+    remaining = tpl.slotsRemaining;
+  } else if (max !== null && current !== null) {
+    remaining = max - current;
+  }
+
+  if (remaining !== null && remaining <= 0) {
+    return { ok: false, error: "Phiên này đã hết chỗ, không thể đăng ký." };
+  }
+
+  // 3. Kiểm tra xung đột lịch với các phiên SẮP TỚI / CHỜ XÁC NHẬN của sinh viên
+  const newRange = parseSimpleRange(tpl.time || "");
+  if (newRange) {
+    const myUpcoming = mockSessions.filter(
+      (s) =>
+        s.username === username &&
+        (s.status === "sap_toi" || s.status === "cho_xac_nhan")
+    );
+
+    const conflict = myUpcoming.some((b) => {
+      const r = parseSimpleRange(b.time);
+      return r && isTimeConflict(newRange, r);
+    });
+
+    if (conflict) {
+      return {
+        ok: false,
+        error:
+          "Phiên này bị trùng thời gian với một phiên bạn đã đăng ký trước đó.",
+      };
+    }
+  }
+
+  // 4. Tạo booking mới trong mockSessions
+  const newBooking: Session = {
+    code: tpl.code || tpl.id || sessionCode,
+    title: tpl.title || "",
+    time: tpl.time || "",
+    method: tpl.method || tpl.format || "Trực tiếp",
+    location: tpl.location || "",
+    status: "sap_toi",
+    username,
+  };
+
+  mockSessions.push(newBooking);
+
+  // 5. Cập nhật sức chứa trong SESSIONS
+  // if (remaining !== null) {
+  //   if (typeof tpl.remaining === "number") {
+  //     rawSessions[indexSession] = {
+  //       ...tpl,
+  //       remaining: remaining - 1,
+  //     };
+  //   } else if (typeof tpl.slotsRemaining === "number") {
+  //     rawSessions[indexSession] = {
+  //       ...tpl,
+  //       slotsRemaining: remaining - 1,
+  //     };
+  //   } else if (max !== null && current !== null) {
+  //     rawSessions[indexSession] = {
+  //       ...tpl,
+  //       current: current + 1,
+  //     };
+  //   }
+  // }
+
+  console.log("[FAKE API] bookSessionMock", {
+    username,
+    sessionCode,
+    booking: newBooking,
+    updatedSession: rawSessions[indexSession],
+  });
+
+  return { ok: true, booking: newBooking };
 }

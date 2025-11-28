@@ -17,7 +17,7 @@ export const SESSIONS = [
   { 
     id: "S001", 
     title: "Giới thiệu về Phát triển Web", 
-    time: "2024-07-20 10:00", 
+    time: "2024-07-20 10:00 - 12:00", 
     format: "Trực tuyến", 
     status: "Sắp tới", 
     current: 15, 
@@ -29,7 +29,7 @@ export const SESSIONS = [
   { 
     id: "S002", 
     title: "Kỹ năng Phỏng vấn IT", 
-    time: "2024-07-25 14:00", 
+    time: "2024-07-25 14:00 - 16:00", 
     format: "Trực tiếp", 
     status: "Sắp tới", 
     current: 10, 
@@ -41,7 +41,7 @@ export const SESSIONS = [
   { 
     id: "S003", 
     title: "Xây dựng Portfolio Chuyên nghiệp", 
-    time: "2024-08-01 09:30", 
+    time: "2024-08-01 09:30 - 11:00", 
     format: "Trực tuyến", 
     status: "Sắp tới", 
     current: 20, 
