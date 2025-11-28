@@ -76,7 +76,7 @@ function TutorScheduleComponent() {
                 </label>
                 <label className="flex items-center space-x-2">
                   <input type="radio" name="format" value="Offline" className="h-4 w-4 text-blue-600" />
-                  <span className="text-gray-900">Ngoài tuyến (Offline)</span>
+                  <span className="text-gray-900">Ngoại tuyến (Offline)</span>
                 </label>
               </div>
             </div>
