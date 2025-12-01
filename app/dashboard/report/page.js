@@ -3,6 +3,7 @@ import Header from '@/components/Header';
 import { REPORT } from '@/data/mockData';
 import { Search, Calendar, Users, CheckCircle, Loader } from 'lucide-react';
 import { Download,FileText } from 'lucide-react';
+import jsPDF from "jspdf";
 
 export default function SessionListPage() {
   return (
@@ -103,29 +104,66 @@ export default function SessionListPage() {
 }
 
 const exportCSV = () => {
-  const data = [];
-
+  const headers = [
+    "id",
+    "title",
+    "studentCount",
+    "time",
+    "avgScore",
+    "status",
+    "note"
+  ];
+  const data = [
+    headers,
+    ...REPORT.map(item => [
+      item.id,
+      item.title,
+      item.studentCount,
+      item.time,
+      item.avgScore ?? "",
+      item.status,
+      item.note || ""
+    ])
+  ];
   let csvContent =
     "data:text/csv;charset=utf-8," +
     data.map((row) => row.join(",")).join("\n");
-
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement("a");
   link.href = encodedUri;
-  link.download = "data.csv";
+  link.download = "report.csv";
   link.click();
 };
 
 const exportPDF = () => {
-  const data = [];
+  const doc = new jsPDF();
+  let y = 15;
+  doc.setFontSize(18);
+  doc.text("BÁO CÁO CÁC BUỔI HỌC", 10, y);
+  y += 10;
 
-  let csvContent =
-    "data:text/pdf;charset=utf-8," +
-    data.map((row) => row.join(",")).join("\n");
-
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.href = encodedUri;
-  link.download = "report.pdf";
-  link.click();
+  REPORT.forEach((item, index) => {
+    doc.setFontSize(12);
+    const lines = [
+      `Mã buổi học: ${item.id}`,
+      `Tiêu đề: ${item.title}`,
+      `Số sinh viên: ${item.studentCount}`,
+      `Thời gian: ${item.time}`,
+      `Điểm trung bình: ${item.avgScore ?? "Chưa có"}`,
+      `Trạng thái: ${item.status}`,
+      `Ghi chú: ${item.note || "Không có"}`
+    ];
+    lines.forEach(line => {
+      doc.text(line, 10, y);
+      y += 7;
+    });
+    y += 3;
+    doc.line(10, y, 200, y);
+    y += 10;
+    if (y > 270) {
+      doc.addPage();
+      y = 15;
+    }
+  });
+  doc.save("report.pdf");
 };
