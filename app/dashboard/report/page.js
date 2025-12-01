@@ -139,19 +139,19 @@ const exportPDF = () => {
   const doc = new jsPDF();
   let y = 15;
   doc.setFontSize(18);
-  doc.text("BÁO CÁO CÁC BUỔI HỌC", 10, y);
+  doc.text("PROGRAM REPORT", 10, y);
   y += 10;
 
   REPORT.forEach((item, index) => {
     doc.setFontSize(12);
     const lines = [
-      `Mã buổi học: ${item.id}`,
-      `Tiêu đề: ${item.title}`,
-      `Số sinh viên: ${item.studentCount}`,
-      `Thời gian: ${item.time}`,
-      `Điểm trung bình: ${item.avgScore ?? "Chưa có"}`,
-      `Trạng thái: ${item.status}`,
-      `Ghi chú: ${item.note || "Không có"}`
+      `Course ID: ${item.id}`,
+      `Title: ${item.title}`,
+      `Number of student: ${item.studentCount}`,
+      `Time: ${item.time}`,
+      `Average Score: ${item.avgScore ?? "None"}`,
+      `Status: ${item.status}`,
+      `Note: ${item.note || "None"}`
     ];
     lines.forEach(line => {
       doc.text(line, 10, y);
