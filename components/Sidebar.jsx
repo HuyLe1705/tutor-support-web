@@ -73,8 +73,8 @@ export default function Sidebar() {
                icon: UserCircle, 
                type: 'dropdown',
                items: [
-                   { label: 'Cập nhật hồ sơ mở rộng', href: '/dashboard/profile/update' },
-                   { label: 'Thêm mới hồ sơ mở rộng', href: '/dashboard/profile/create' },
+                  //  { label: 'Cập nhật hồ sơ mở rộng', href: '/dashboard/profile/update' },
+                  //  { label: 'Thêm mới hồ sơ mở rộng', href: '/dashboard/profile/create' },
                    { label: 'Xem hồ sơ mở rộng', href: '/dashboard/profile/view' },
                ]
            }]}
@@ -92,22 +92,22 @@ export default function Sidebar() {
                  items: [
                      
                       { label: 'Đăng kí chương trình', href: '/dashboard/student/register', icon: PenTool, type: 'link' },
-                      { label: 'Đăng ký của tôi', href: '/dashboard/student/my-registration', icon: CheckSquare, type: 'link' },
+                      // { label: 'Đăng ký của tôi', href: '/dashboard/student/my-registration', icon: CheckSquare, type: 'link' },
                       { label: 'Tìm kiếm Tutor', href: '/dashboard/student/search', icon: Search, type: 'link' },
                       { label: 'Danh sách các phiên khả dụng', href: '/dashboard/student/search_session', icon: Search, type: 'link' },
                       { label: 'Danh sách các phiên đã đăng ký', href: '/dashboard/student/my-booking', icon: Calendar, type: 'link' },
-                      { label: 'Cấu hình kênh/tần suất thông báo', href: '/dashboard/student/notifications', icon: Bell, type: 'link' },
-                      { label: 'Xem biên bản', href: '/dashboard/student/report', icon: TrendingUp, type: 'link' },
+                      // { label: 'Cấu hình kênh/tần suất thông báo', href: '/dashboard/student/notifications', icon: Bell, type: 'link' },
+                      // { label: 'Xem biên bản', href: '/dashboard/student/report', icon: TrendingUp, type: 'link' },
                      
                               ]
              },
              // 3. Các mục đơn khác
-             { label: 'Phản hồi và đánh giá', href: '/dashboard/student/feedback', icon: MessageSquare, type: 'link' },
-             { label: 'Tiến độ học tập', href: '/dashboard/student/progress', icon: BarChart3, type: 'link' },
-             { label: 'Báo cáo', href: '/dashboard/student/report', icon: FileText, type: 'link' },
-             { label: 'Tài liệu học tập', href: '/dashboard/student/materials', icon: BookOpen, type: 'link' },
-             { label: 'Không gian hỏi đáp', href: '/dashboard/student/qa', icon: HelpCircle, type: 'link' },
-             { label: 'Cá nhân hóa học tập', href: '/dashboard/student/personalization', icon: Settings, type: 'link' },
+            //  { label: 'Phản hồi và đánh giá', href: '/dashboard/student/feedback', icon: MessageSquare, type: 'link' },
+            //  { label: 'Tiến độ học tập', href: '/dashboard/student/progress', icon: BarChart3, type: 'link' },
+            //  { label: 'Báo cáo', href: '/dashboard/student/report', icon: FileText, type: 'link' },
+            //  { label: 'Tài liệu học tập', href: '/dashboard/student/materials', icon: BookOpen, type: 'link' },
+            //  { label: 'Không gian hỏi đáp', href: '/dashboard/student/qa', icon: HelpCircle, type: 'link' },
+            //  { label: 'Cá nhân hóa học tập', href: '/dashboard/student/personalization', icon: Settings, type: 'link' },
              
         ]
     }
@@ -122,13 +122,13 @@ export default function Sidebar() {
             items: [
                 { label: 'Thiết lập lịch rảnh', href: '/dashboard/schedule' },
                 { label: 'Quản lý phiên', href: '/dashboard/session' },
-                { label: 'Duyệt tham gia phiên', href: '/dashboard/approve' },
-                { label: 'Điểm danh', href: '/dashboard/attendance' },
+                // { label: 'Duyệt tham gia phiên', href: '/dashboard/approve' },
+                // { label: 'Điểm danh', href: '/dashboard/attendance' },
             ]
         },
         { label: 'Báo cáo tổng quan', href: '/dashboard/report', icon: BarChart3, type: 'link' },
-        { label: 'Cài đặt thông báo', href: '/dashboard/nofication',icon: BarChart3, type: 'link' },
-        { label: 'Quản lý biên bản', href: '/dashboard/Tutor/report_management',icon: BarChart3, type: 'link' },
+        // { label: 'Cài đặt thông báo', href: '/dashboard/nofication',icon: BarChart3, type: 'link' },
+        // { label: 'Quản lý biên bản', href: '/dashboard/Tutor/report_management',icon: BarChart3, type: 'link' },
         
       ]
     };

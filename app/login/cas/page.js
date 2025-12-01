@@ -83,10 +83,10 @@ export default function CasLoginPage() {
             
             {/* Checkbox Warn */}
             <div className="flex items-start gap-2 mt-3">
-               <input type="checkbox" className="mt-1" /> 
+               {/* <input type="checkbox" className="mt-1" /> 
                <span className="text-[11px] text-gray-600 leading-tight">
                  Warn me before logging me into other sites.
-               </span>
+               </span> */}
             </div>
 
             {/* Buttons */}
@@ -107,9 +107,9 @@ export default function CasLoginPage() {
             </div>
             
             {/* Change Password Link */}
-            <div className="mt-4 ">
+            {/* <div className="mt-4 ">
                 <a href="#" className="text-blue-800 text-xs underline hover:text-red-600">Change password?</a>
-            </div>
+            </div> */}
 
             {/* (Optional) Quick Fill for Demo purpose inside CAS page if needed, 
                 but kept hidden to maintain strict UI compliance */}
@@ -122,7 +122,7 @@ export default function CasLoginPage() {
             <div>
                 <span className="font-bold text-[#990033] block mb-1">Languages:</span>
                 <div className="flex gap-3">
-                    <span className="text-black font-bold border border-gray-400 px-1 bg-gray-100 cursor-default">English</span>
+                    {/* <span className="text-black font-bold border border-gray-400 px-1 bg-gray-100 cursor-default">English</span> */}
                     <span className="text-blue-800 underline cursor-pointer hover:text-red-600">Vietnamese</span>
                     {/* <span className="text-blue-800 underline cursor-pointer hover:text-red-600">Espanol</span> */} 
                 </div>
