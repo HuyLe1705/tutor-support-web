@@ -10,43 +10,24 @@ export default function SessionListPage() {
       <Header title="Danh sách các buổi học" />
       <main className="p-8">
 
-        {/* Khối chính */}
         <div className="bg-white rounded-lg shadow p-6">
 
           <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
             Các buổi học trong kỳ
           </h3>
 
-          {/* Toolbar */}
-          <div className="flex flex-wrap gap-3 mb-6 bg-gray-50 p-4 rounded-lg items-center justify-between">
-            <div className="flex gap-3 flex-1">
-              <div className="relative">
-                <Search size={16} className="absolute left-3 top-3 text-gray-400"/>
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm tên buổi học"
-                  className="pl-9 pr-4 py-2 border rounded text-sm w-64 focus:outline-blue-500"
-                />
-              </div>
+          <div className="flex flex-wrap gap-3 mb-6 p-4 rounded-lg items-center justify-between">
+            <div className="ml-auto flex gap-2">
 
-              <select className="border rounded px-3 py-2 text-sm text-gray-600">
-                <option>Trạng thái: Tất cả</option>
-                <option>Đang diễn ra</option>
-                <option>Hoàn thành</option>
-                <option>Chưa bắt đầu</option>
-              </select>
-            </div>
-            <div className="flex gap-2">
-                <button className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 flex items-center gap-1">
+                <button onClick={exportCSV} className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 flex items-center gap-1">
                     <Download size={14}/> Export CSV
                 </button>
-                <button className="px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 flex items-center gap-1">
+                <button onClick={exportPDF} className="px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 flex items-center gap-1">
                     <FileText size={14}/> Export PDF
                 </button>
             </div>
           </div>
         
-          {/* Table */}
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left text-gray-500">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50">
@@ -115,20 +96,36 @@ export default function SessionListPage() {
             </table>
           </div>
 
-          <div className="flex justify-between items-center mt-4 border-t pt-4">
-            <span className="text-sm text-gray-600">Dòng mỗi trang: 10</span>
-            <div className="flex gap-1">
-              <button className="px-3 py-1 border rounded hover:bg-gray-100 text-sm">Previous</button>
-              <button className="px-3 py-1 bg-blue-600 text-white rounded text-sm">1</button>
-              <button className="px-3 py-1 border rounded hover:bg-gray-100 text-sm">2</button>
-              <button className="px-3 py-1 border rounded hover:bg-gray-100 text-sm">Next</button>
-            </div>
-          </div>
-
         </div>
       </main>
     </>
   );
 }
 
+const exportCSV = () => {
+  const data = [];
 
+  let csvContent =
+    "data:text/csv;charset=utf-8," +
+    data.map((row) => row.join(",")).join("\n");
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.href = encodedUri;
+  link.download = "data.csv";
+  link.click();
+};
+
+const exportPDF = () => {
+  const data = [];
+
+  let csvContent =
+    "data:text/pdf;charset=utf-8," +
+    data.map((row) => row.join(",")).join("\n");
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.href = encodedUri;
+  link.download = "report.pdf";
+  link.click();
+};
