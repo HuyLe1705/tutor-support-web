@@ -112,7 +112,7 @@ export const USERS = [
 export const REPORT = [
   {
     id: "S001",
-    title: "Buổi học 1: Nhập môn",
+    title: "Nhập môn điện toán",
     studentCount: 32,
     time: "10/10/2025 - 14:00",
     avgScore: 8.2,
@@ -121,7 +121,7 @@ export const REPORT = [
   },
   {
     id: "S002",
-    title: "Buổi học 2: OOP",
+    title: "OOP",
     studentCount: 28,
     time: "15/10/2025 - 18:00",
     avgScore: 7.6,
@@ -130,7 +130,7 @@ export const REPORT = [
   },
   {
     id: "S003",
-    title: "Buổi học 3: CTDL & GT",
+    title: "CTDL & GT",
     studentCount: 30,
     time: "20/10/2025 - 14:00",
     avgScore: null,
