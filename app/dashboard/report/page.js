@@ -3,6 +3,7 @@ import Header from '@/components/Header';
 import { REPORT } from '@/data/mockData';
 import { Search, Calendar, Users, CheckCircle, Loader } from 'lucide-react';
 import { Download,FileText } from 'lucide-react';
+import jsPDF from "jspdf";
 
 export default function SessionListPage() {
   return (
@@ -103,29 +104,66 @@ export default function SessionListPage() {
 }
 
 const exportCSV = () => {
-  const data = [];
-
+  const headers = [
+    "id",
+    "title",
+    "studentCount",
+    "time",
+    "avgScore",
+    "status",
+    "note"
+  ];
+  const data = [
+    headers,
+    ...REPORT.map(item => [
+      item.id,
+      item.title,
+      item.studentCount,
+      item.time,
+      item.avgScore ?? "",
+      item.status,
+      item.note || ""
+    ])
+  ];
   let csvContent =
     "data:text/csv;charset=utf-8," +
     data.map((row) => row.join(",")).join("\n");
-
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement("a");
   link.href = encodedUri;
-  link.download = "data.csv";
+  link.download = "report.csv";
   link.click();
 };
 
 const exportPDF = () => {
-  const data = [];
+  const doc = new jsPDF();
+  let y = 15;
+  doc.setFontSize(18);
+  doc.text("PROGRAM REPORT", 10, y);
+  y += 10;
 
-  let csvContent =
-    "data:text/pdf;charset=utf-8," +
-    data.map((row) => row.join(",")).join("\n");
-
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.href = encodedUri;
-  link.download = "report.pdf";
-  link.click();
+  REPORT.forEach((item, index) => {
+    doc.setFontSize(12);
+    const lines = [
+      `Course ID: ${item.id}`,
+      `Title: ${item.title}`,
+      `Number of student: ${item.studentCount}`,
+      `Time: ${item.time}`,
+      `Average Score: ${item.avgScore ?? "None"}`,
+      `Status: ${item.status}`,
+      `Note: ${item.note || "None"}`
+    ];
+    lines.forEach(line => {
+      doc.text(line, 10, y);
+      y += 7;
+    });
+    y += 3;
+    doc.line(10, y, 200, y);
+    y += 10;
+    if (y > 270) {
+      doc.addPage();
+      y = 15;
+    }
+  });
+  doc.save("report.pdf");
 };

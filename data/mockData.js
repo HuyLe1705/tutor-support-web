@@ -112,12 +112,12 @@ export const USERS = [
 export const REPORT = [
   {
     id: "S001",
-    title: "Nhập môn điện toán",
+    title: "Software Engineering",
     studentCount: 32,
     time: "10/10/2025 - 14:00",
     avgScore: 8.2,
-    status: "Hoàn thành",
-    note: "Buổi học diễn ra suôn sẻ."
+    status: "Completed",
+    note: "Good lesson."
   },
   {
     id: "S002",
@@ -125,7 +125,7 @@ export const REPORT = [
     studentCount: 28,
     time: "15/10/2025 - 18:00",
     avgScore: 7.6,
-    status: "Đang diễn ra",
+    status: "On going",
     note: ""
   },
   {
@@ -134,7 +134,7 @@ export const REPORT = [
     studentCount: 30,
     time: "20/10/2025 - 14:00",
     avgScore: null,
-    status: "Chưa bắt đầu",
-    note: "Chờ sinh viên đăng ký thêm."
+    status: "Not start yet",
+    note: "Waiting for more students."
   }
 ];
